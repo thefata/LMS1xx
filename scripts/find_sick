@@ -22,11 +22,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-#Use: rosrun lms1xx find_sick
+# Use: rosrun lms1xx find_sick
 
-import sys
 import socket
 from HTMLParser import HTMLParser
+
 
 class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
@@ -38,7 +38,7 @@ class MyHTMLParser(HTMLParser):
         elif ('IPAddress' in attr_list[0]):
             print "   ", attr_list[1]
 
-#set variables
+# set variables
 UDP_PORT = 30718
 UDP_DATA_discovery = '10000008ffffffffffff412eb5ee01000ad33705ffffff00'.decode('hex')
 
@@ -46,25 +46,25 @@ parser = MyHTMLParser()
 data = ""
 laser_count = 0
 
-#open UDP socket
+# open UDP socket
 UDP_SOCK = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_SOCK.settimeout(2)
 UDP_SOCK.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-#send UDP broadcast
+# send UDP broadcast
 UDP_SOCK.sendto(UDP_DATA_discovery, ('<broadcast>', UDP_PORT))
 
-#receive UDP reply
+# receive UDP reply
 while True:
     try:
-        data,addr = UDP_SOCK.recvfrom(1024)
+        data, addr = UDP_SOCK.recvfrom(1024)
         if ('<?xml' in data):
             laser_count += 1
             if (laser_count == 1):
                 print "Lasers found:"
             parser.feed(data)
     except socket.timeout:
-        break;
+        break
 
 if (laser_count == 0):
     print "No lasers found.\n"
